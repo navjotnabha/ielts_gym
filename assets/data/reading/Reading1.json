@@ -1,0 +1,81 @@
+{
+  "title": "The Science of Climate Change",
+  "passage": "The debate over climate change and its potential impacts has grown increasingly urgent in recent years. Scientific evidence now strongly suggests that human activities, primarily the burning of fossil fuels and deforestation, are contributing to the warming of the Earth’s atmosphere. This phenomenon, commonly referred to as global warming, is expected to bring about significant changes in global weather patterns, sea levels, and biodiversity.\n\nThe greenhouse effect, a natural process that warms the Earth’s surface, is being intensified by increased levels of carbon dioxide (CO2) and other greenhouse gases in the atmosphere. These gases trap heat from the sun, preventing it from escaping back into space. While the greenhouse effect is essential for life on Earth, an overabundance of greenhouse gases can lead to excessive warming.\n\nScientists use climate models to predict future climate conditions. These models incorporate data from past climate patterns, current atmospheric conditions, and various scenarios for future greenhouse gas emissions. Despite some uncertainties, the consensus among climate scientists is that continued increases in greenhouse gas emissions will likely lead to more severe and frequent weather events, such as hurricanes, droughts, and heavy rainfall.\n\nGovernments and organizations worldwide are taking steps to mitigate climate change. Strategies include reducing greenhouse gas emissions, increasing energy efficiency, and investing in renewable energy sources like wind and solar power. Additionally, efforts to conserve forests and enhance carbon sequestration are seen as crucial in addressing climate change.",
+  "questions": [
+    {
+      "type": "multiple_choice",
+      "question": "What is the main cause of the current global warming trend according to the passage?",
+      "options": [
+        "A. Natural climate cycles",
+        "B. Volcanic activity",
+        "C. Human activities",
+        "D. Solar variations"
+      ],
+      "answer": "C"
+    },
+    {
+      "type": "multiple_choice",
+      "question": "Which of the following is a result of the intensified greenhouse effect?",
+      "options": [
+        "A. Cooling of the Earth's surface",
+        "B. Increased volcanic activity",
+        "C. Rising sea levels",
+        "D. Decreased levels of CO2"
+      ],
+      "answer": "C"
+    },
+    {
+      "type": "true_false_not_given",
+      "question": "Human activities have no impact on global warming.",
+      "answer": "False"
+    },
+    {
+      "type": "true_false_not_given",
+      "question": "Climate models can predict future climate conditions with absolute certainty.",
+      "answer": "False"
+    },
+    {
+      "type": "matching_headings",
+      "question": "Match the following headings with the appropriate paragraph from the passage:",
+      "headings": [
+        "i. Strategies to Combat Climate Change",
+        "ii. The Role of Greenhouse Gases",
+        "iii. Predicting Future Climate Changes",
+        "iv. Understanding the Greenhouse Effect"
+      ],
+      "paragraphs": [
+        {
+          "paragraph": 1,
+          "heading": "ii"
+        },
+        {
+          "paragraph": 2,
+          "heading": "iv"
+        },
+        {
+          "paragraph": 3,
+          "heading": "iii"
+        },
+        {
+          "paragraph": 4,
+          "heading": "i"
+        }
+      ]
+    },
+    {
+      "type": "short_answer",
+      "question": "What do climate models use to predict future climate conditions?",
+      "answer": "Data from past climate patterns, current atmospheric conditions, and various scenarios for future greenhouse gas emissions."
+    },
+    {
+      "type": "short_answer",
+      "question": "Name two renewable energy sources mentioned in the passage.",
+      "answer": "Wind and solar power."
+    },
+    {
+      "type": "short_answer",
+      "question": "What is the essential process that warms the Earth’s surface called?",
+      "answer": "The greenhouse effect."
+    }
+  ]
+}
