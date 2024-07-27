@@ -22,10 +22,40 @@ class _ReadingScreenState extends State<ReadingScreen> {
   }
 
   Future<ReadingTest> loadReadingContent() async {
-    String jsonString = await rootBundle.loadString('assets/data/reading/reading1.json');
-    final jsonResponse = json.decode(jsonString);
-    print('JSON Response: $jsonResponse'); // Add this line
-    return ReadingTest.fromJson(jsonResponse);
+    try {
+      String jsonString = await rootBundle.loadString('assets/data/reading/Reading1.json');
+      print('JSON String: $jsonString'); // Debugging line
+      final jsonResponse = json.decode(jsonString);
+      print('JSON Response: $jsonResponse'); // Debugging line
+      return ReadingTest.fromJson(jsonResponse);
+    } catch (e) {
+      print('Error loading JSON: $e'); // Debugging line
+      throw e;
+    }
+  }
+
+  void checkAnswers(ReadingTest test) {
+    int correctAnswers = 0;
+    for (var section in test.sections) {
+      for (var question in section.questions) {
+        if (selectedAnswers[question.question] == question.answer) {
+          correctAnswers++;
+        }
+      }
+    }
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Results'),
+        content: Text('You got $correctAnswers out of 40 correct!'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -41,29 +71,52 @@ class _ReadingScreenState extends State<ReadingScreen> {
             if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else if (snapshot.hasData) {
+              print('Data Loaded: ${snapshot.data}'); // Debugging line
               return buildContent(snapshot.data!);
             }
           }
           return const Center(child: CircularProgressIndicator());
         },
       ),
+      floatingActionButton: FutureBuilder<ReadingTest>(
+        future: readingContent,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+            return FloatingActionButton(
+              onPressed: () => checkAnswers(snapshot.data!),
+              child: const Icon(Icons.check),
+            );
+          }
+          return Container();
+        },
+      ),
     );
   }
 
   Widget buildContent(ReadingTest data) {
+    print('Building Content'); // Debugging line
     return ListView(
       padding: const EdgeInsets.all(16),
+      children: data.sections.map<Widget>((section) => buildSection(section)).toList(),
+    );
+  }
+
+  Widget buildSection(Section section) {
+    print('Building Section: ${section.title}'); // Debugging line
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(data.title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+        Text(section.title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
         const SizedBox(height: 20),
-        Text(data.passage, style: const TextStyle(fontSize: 16)),
+        Text(section.passage, style: const TextStyle(fontSize: 16)),
         const SizedBox(height: 20),
-        ...data.questions.map<Widget>((question) => buildQuestion(question)).toList(),
+        ...section.questions.map<Widget>((question) => buildQuestion(question)).toList(),
       ],
     );
   }
 
   Widget buildQuestion(Question question) {
+    print('Building Question: ${question.question}'); // Debugging line
     if (question.type == 'multiple_choice') {
       return buildMultipleChoiceQuestion(question);
     } else if (question.type == 'true_false_not_given') {

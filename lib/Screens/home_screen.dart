@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ielts_gym/Screens/practice_screen.dart';
+import 'practice_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
