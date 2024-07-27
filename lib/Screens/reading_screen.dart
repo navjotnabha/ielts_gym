@@ -14,6 +14,7 @@ class ReadingScreen extends StatefulWidget {
 class _ReadingScreenState extends State<ReadingScreen> {
   late Future<ReadingTest> readingContent;
   Map<String, String?> selectedAnswers = {};
+  int _currentSectionIndex = 0;
 
   @override
   void initState() {
@@ -78,26 +79,59 @@ class _ReadingScreenState extends State<ReadingScreen> {
           return const Center(child: CircularProgressIndicator());
         },
       ),
-      floatingActionButton: FutureBuilder<ReadingTest>(
-        future: readingContent,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-            return FloatingActionButton(
-              onPressed: () => checkAnswers(snapshot.data!),
-              child: const Icon(Icons.check),
-            );
-          }
-          return Container();
-        },
-      ),
     );
   }
 
   Widget buildContent(ReadingTest data) {
     print('Building Content'); // Debugging line
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: data.sections.map<Widget>((section) => buildSection(section)).toList(),
+    return Column(
+      children: [
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [buildSection(data.sections[_currentSectionIndex])],
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            if (_currentSectionIndex > 0)
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _currentSectionIndex--;
+                    });
+                  },
+                  child: const Text('Previous Section'),
+                ),
+              ),
+            if (_currentSectionIndex < data.sections.length - 1)
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _currentSectionIndex++;
+                    });
+                  },
+                  child: const Text('Next Section'),
+                ),
+              ),
+            if (_currentSectionIndex == data.sections.length - 1)
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: ElevatedButton(
+                  onPressed: () {
+                    checkAnswers(data);
+                  },
+                  child: const Text('Submit'),
+                ),
+              ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -110,30 +144,34 @@ class _ReadingScreenState extends State<ReadingScreen> {
         const SizedBox(height: 20),
         Text(section.passage, style: const TextStyle(fontSize: 16)),
         const SizedBox(height: 20),
-        ...section.questions.map<Widget>((question) => buildQuestion(question)).toList(),
+        ...section.questions.asMap().entries.map<Widget>((entry) {
+          int index = entry.key + 1;
+          Question question = entry.value;
+          return buildQuestion(index, question);
+        }).toList(),
       ],
     );
   }
 
-  Widget buildQuestion(Question question) {
+  Widget buildQuestion(int index, Question question) {
     print('Building Question: ${question.question}'); // Debugging line
     if (question.type == 'multiple_choice') {
-      return buildMultipleChoiceQuestion(question);
+      return buildMultipleChoiceQuestion(index, question);
     } else if (question.type == 'true_false_not_given') {
-      return buildTrueFalseNotGivenQuestion(question);
+      return buildTrueFalseNotGivenQuestion(index, question);
     } else if (question.type == 'matching_headings') {
-      return buildMatchingHeadingsQuestion(question);
+      return buildMatchingHeadingsQuestion(index, question);
     } else if (question.type == 'short_answer') {
-      return buildShortAnswerQuestion(question);
+      return buildShortAnswerQuestion(index, question);
     }
     return Container();
   }
 
-  Widget buildMultipleChoiceQuestion(Question question) {
+  Widget buildMultipleChoiceQuestion(int index, Question question) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(question.question, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text('$index. ${question.question}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         ...question.options!.map<Widget>((option) {
           return RadioListTile<String>(
             title: Text(option),
@@ -150,11 +188,11 @@ class _ReadingScreenState extends State<ReadingScreen> {
     );
   }
 
-  Widget buildTrueFalseNotGivenQuestion(Question question) {
+  Widget buildTrueFalseNotGivenQuestion(int index, Question question) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(question.question, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text('$index. ${question.question}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         RadioListTile<String>(
           title: const Text('True'),
           value: 'True',
@@ -189,11 +227,11 @@ class _ReadingScreenState extends State<ReadingScreen> {
     );
   }
 
-  Widget buildMatchingHeadingsQuestion(Question question) {
+  Widget buildMatchingHeadingsQuestion(int index, Question question) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(question.question, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text('$index. ${question.question}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         ...question.headings!.map<Widget>((heading) {
           return Text(heading, style: const TextStyle(fontSize: 16));
         }).toList(),
@@ -201,11 +239,11 @@ class _ReadingScreenState extends State<ReadingScreen> {
     );
   }
 
-  Widget buildShortAnswerQuestion(Question question) {
+  Widget buildShortAnswerQuestion(int index, Question question) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(question.question, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text('$index. ${question.question}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         TextField(
           onChanged: (value) {
             setState(() {
