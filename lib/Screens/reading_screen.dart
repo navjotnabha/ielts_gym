@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/question_model.dart';
 import '../models/reading_test.dart';
- 
+import 'result_screen.dart';
+
 class ReadingScreen extends StatefulWidget {
   const ReadingScreen({Key? key}) : super(key: key);
 
@@ -15,6 +16,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
   late Future<ReadingTest> readingContent;
   Map<String, String?> selectedAnswers = {};
   int _currentSectionIndex = 0;
+  bool _isAnalyseMode = false;
 
   @override
   void initState() {
@@ -44,17 +46,25 @@ class _ReadingScreenState extends State<ReadingScreen> {
         }
       }
     }
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Results'),
-        content: Text('You got $correctAnswers out of 40 correct!'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
-          ),
-        ],
+    showResults(correctAnswers);
+  }
+
+  void showResults(int correctAnswers) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ResultScreen(
+          correctAnswers: correctAnswers,
+          onRetry: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const ReadingScreen()));
+          },
+          onAnalyse: () {
+            Navigator.of(context).pop();
+            setState(() {
+              _isAnalyseMode = true;
+            });
+          },
+        ),
       ),
     );
   }
@@ -178,26 +188,65 @@ class _ReadingScreenState extends State<ReadingScreen> {
 
   Widget buildQuestion(int index, Question question) {
     print('Building Question: ${question.question}'); // Debugging line
+    bool isCorrect = selectedAnswers[question.question] == question.answer;
+
     if (question.type == 'multiple_choice') {
-      return buildMultipleChoiceQuestion(index, question);
+      return buildMultipleChoiceQuestion(index, question, isCorrect);
     } else if (question.type == 'true_false_not_given') {
-      return buildTrueFalseNotGivenQuestion(index, question);
+      return buildTrueFalseNotGivenQuestion(index, question, isCorrect);
     } else if (question.type == 'matching_headings') {
-      return buildMatchingHeadingsQuestion(index, question);
+      return buildMatchingHeadingsQuestion(index, question, isCorrect);
     } else if (question.type == 'short_answer') {
-      return buildShortAnswerQuestion(index, question);
+      return buildShortAnswerQuestion(index, question, isCorrect);
     }
     return Container();
   }
 
-  Widget buildMultipleChoiceQuestion(int index, Question question) {
+  Widget buildMultipleChoiceQuestion(int index, Question question, bool isCorrect) {
+    bool isAnswered = selectedAnswers.containsKey(question.question);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (_isAnalyseMode && !isAnswered)
+          const Padding(
+            padding: EdgeInsets.only(left: 16.0),
+            child: Text(
+              'Not answered',
+              style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+            ),
+          ),
         Text('$index. ${question.question}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         ...question.options!.map<Widget>((option) {
-          return RadioListTile<String>(
-            title: Text(option),
+          Color color = Colors.black;
+          IconData? icon;
+          if (_isAnalyseMode) {
+            if (selectedAnswers[question.question] == option) {
+              if (option == question.answer) {
+                color = Colors.green;
+                icon = Icons.check;
+              } else {
+                color = Colors.red;
+                icon = Icons.close;
+              }
+            } else if (option == question.answer) {
+              color = Colors.green;
+              icon = Icons.check;
+            }
+          }
+          return _isAnalyseMode
+              ? ListTile(
+            title: Row(
+              children: [
+                Flexible(child: Text(option, style: TextStyle(color: color))),
+                if (icon != null) ...[
+                  const SizedBox(width: 10),
+                  Icon(icon, color: color),
+                ]
+              ],
+            ),
+          )
+              : RadioListTile<String>(
+            title: Flexible(child: Text(option)),
             value: option,
             groupValue: selectedAnswers[question.question],
             onChanged: (value) {
@@ -207,50 +256,66 @@ class _ReadingScreenState extends State<ReadingScreen> {
             },
           );
         }).toList(),
+        const Divider(color: Colors.grey), // Add divider between questions in analyse mode
       ],
     );
   }
 
-  Widget buildTrueFalseNotGivenQuestion(int index, Question question) {
+  Widget buildTrueFalseNotGivenQuestion(int index, Question question, bool isCorrect) {
+    bool isAnswered = selectedAnswers.containsKey(question.question);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (_isAnalyseMode && !isAnswered)
+          const Padding(
+            padding: EdgeInsets.only(left: 16.0),
+            child: Text(
+              'Not answered',
+              style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+            ),
+          ),
         Text('$index. ${question.question}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        RadioListTile<String>(
-          title: const Text('True'),
-          value: 'True',
-          groupValue: selectedAnswers[question.question],
-          onChanged: (value) {
-            setState(() {
-              selectedAnswers[question.question] = value;
-            });
-          },
-        ),
-        RadioListTile<String>(
-          title: const Text('False'),
-          value: 'False',
-          groupValue: selectedAnswers[question.question],
-          onChanged: (value) {
-            setState(() {
-              selectedAnswers[question.question] = value;
-            });
-          },
-        ),
-        RadioListTile<String>(
-          title: const Text('Not Given'),
-          value: 'Not Given',
-          groupValue: selectedAnswers[question.question],
-          onChanged: (value) {
-            setState(() {
-              selectedAnswers[question.question] = value;
-            });
-          },
-        ),
+        ...['True', 'False', 'Not Given'].map<Widget>((option) {
+          Color color = Colors.black;
+          IconData? icon;
+          if (_isAnalyseMode && isAnswered) {
+            if (selectedAnswers[question.question] == option) { // option refers to the selected answer
+              color = isCorrect ? Colors.green : Colors.red;
+              icon = isCorrect ? Icons.check : Icons.close;
+            }
+            else if (option == question.answer) {
+              color = Colors.green;
+            }
+          }
+          return _isAnalyseMode
+              ? ListTile(
+            title: Row(
+              children: [
+                Flexible(child: Text(option, style: TextStyle(color: color))),
+                if (icon != null) ...[
+                  const SizedBox(width: 10),
+                  Icon(icon, color: color),
+                ]
+              ],
+            ),
+          )
+              : RadioListTile<String>(
+            title: Flexible(child: Text(option)),
+            value: option,
+            groupValue: selectedAnswers[question.question],
+            onChanged: (value) {
+              setState(() {
+                selectedAnswers[question.question] = value;
+              });
+            },
+          );
+        }).toList(),
+        const Divider(color: Colors.grey), // Add divider between questions in analyse mode
       ],
     );
   }
 
-  Widget buildMatchingHeadingsQuestion(int index, Question question) {
+  Widget buildMatchingHeadingsQuestion(int index, Question question, bool isCorrect) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -258,11 +323,12 @@ class _ReadingScreenState extends State<ReadingScreen> {
         ...question.headings!.map<Widget>((heading) {
           return Text(heading, style: const TextStyle(fontSize: 16));
         }).toList(),
+        const Divider(color: Colors.grey), // Add divider between questions in analyse mode
       ],
     );
   }
 
-  Widget buildShortAnswerQuestion(int index, Question question) {
+  Widget buildShortAnswerQuestion(int index, Question question, bool isCorrect) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -274,6 +340,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
             });
           },
         ),
+        const Divider(color: Colors.grey), // Add divider between questions in analyse mode
       ],
     );
   }
