@@ -27,12 +27,9 @@ class _ReadingScreenState extends State<ReadingScreen> {
   Future<ReadingTest> loadReadingContent() async {
     try {
       String jsonString = await rootBundle.loadString('assets/data/reading/Reading1.json');
-      print('JSON String: $jsonString'); // Debugging line
       final jsonResponse = json.decode(jsonString);
-      print('JSON Response: $jsonResponse'); // Debugging line
       return ReadingTest.fromJson(jsonResponse);
     } catch (e) {
-      print('Error loading JSON: $e'); // Debugging line
       throw e;
     }
   }
@@ -104,7 +101,6 @@ class _ReadingScreenState extends State<ReadingScreen> {
               if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));
               } else if (snapshot.hasData) {
-                print('Data Loaded: ${snapshot.data}'); // Debugging line
                 return buildContent(snapshot.data!);
               }
             }
@@ -116,7 +112,6 @@ class _ReadingScreenState extends State<ReadingScreen> {
   }
 
   Widget buildContent(ReadingTest data) {
-    print('Building Content'); // Debugging line
     return Column(
       children: [
         Expanded(
@@ -169,7 +164,6 @@ class _ReadingScreenState extends State<ReadingScreen> {
   }
 
   Widget buildSection(Section section) {
-    print('Building Section: ${section.title}'); // Debugging line
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -187,7 +181,6 @@ class _ReadingScreenState extends State<ReadingScreen> {
   }
 
   Widget buildQuestion(int index, Question question) {
-    print('Building Question: ${question.question}'); // Debugging line
     bool isCorrect = selectedAnswers[question.question] == question.answer;
 
     if (question.type == 'multiple_choice') {
@@ -256,7 +249,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
             },
           );
         }).toList(),
-        const Divider(color: Colors.grey), // Add divider between questions in analyse mode
+        const Divider(color: Colors.grey),
       ],
     );
   }
@@ -279,7 +272,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
           Color color = Colors.black;
           IconData? icon;
           if (_isAnalyseMode && isAnswered) {
-            if (selectedAnswers[question.question] == option) { // option refers to the selected answer
+            if (selectedAnswers[question.question] == option) {
               color = isCorrect ? Colors.green : Colors.red;
               icon = isCorrect ? Icons.check : Icons.close;
             }
@@ -310,7 +303,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
             },
           );
         }).toList(),
-        const Divider(color: Colors.grey), // Add divider between questions in analyse mode
+        const Divider(color: Colors.grey),
       ],
     );
   }
@@ -323,7 +316,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
         ...question.headings!.map<Widget>((heading) {
           return Text(heading, style: const TextStyle(fontSize: 16));
         }).toList(),
-        const Divider(color: Colors.grey), // Add divider between questions in analyse mode
+        const Divider(color: Colors.grey),
       ],
     );
   }
@@ -340,7 +333,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
             });
           },
         ),
-        const Divider(color: Colors.grey), // Add divider between questions in analyse mode
+        const Divider(color: Colors.grey),
       ],
     );
   }

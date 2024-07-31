@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "798198071035",
+    "project_id": "ielts-gym-edbdf",
+    "storage_bucket": "ielts-gym-edbdf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:798198071035:android:00870b2b183029569cfa5e",
+        "android_client_info": {
+          "package_name": "com.example.ielts_gym"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAf-aLRtpG3kjcvGtSTNc7uFgai01CS1qw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
