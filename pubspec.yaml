@@ -41,6 +41,8 @@ dependencies:
   firebase_auth: ^5.1.2
   firebase_storage: ^12.1.1
   audioplayers: ^6.0.0
+  http: ^0.13.3
+
 
 
 

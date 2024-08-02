@@ -18,12 +18,28 @@ class SectionItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.white,
+      elevation: 4.0,  // Adding shadow
       borderRadius: BorderRadius.circular(8),
+      shadowColor: Colors.black.withOpacity(0.2),
       child: InkWell(
         onTap: () {
           Navigator.pushNamed(context, route);
         },
+        borderRadius: BorderRadius.circular(8), // To match the Material borderRadius
+        splashColor: color.withOpacity(0.2),  // Adding splash color effect
+        highlightColor: color.withOpacity(0.1), // Adding highlight color effect
         child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [

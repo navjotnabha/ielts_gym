@@ -18,9 +18,9 @@ class PracticeScreen extends StatelessWidget {
               items: [
                 GridView.count(
                   shrinkWrap: true,
-                  childAspectRatio: 3/2,
                   crossAxisCount: 2,
                   crossAxisSpacing: 10,
+                  childAspectRatio: 1.75,
                   mainAxisSpacing: 10,
                   padding: const EdgeInsets.all(16),
                   children: const [
