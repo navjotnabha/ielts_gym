@@ -27,7 +27,6 @@ class _ListeningScreenState extends State<ListeningScreen> {
   Future<void> _loadSection() async {
     setState(() {
       _isLoading = true;
-      _isAudioComplete = false;
     });
 
     try {
@@ -66,6 +65,7 @@ class _ListeningScreenState extends State<ListeningScreen> {
     _audioPlayer.stop();
     setState(() {
       _currentSection++;
+      _isAudioComplete = false;
     });
     _loadSection();
   }
@@ -91,17 +91,16 @@ class _ListeningScreenState extends State<ListeningScreen> {
               itemCount: _questionsData['questions'].length,
               itemBuilder: (context, index) {
                 final question = _questionsData['questions'][index];
+                final questionType = _questionsData['questionsType'];
                 return QuestionWidget(
                   question: question,
-                  questionType: _questionsData['questionsType'],
+                  questionType: questionType,
                 );
               },
             ),
           ),
           ElevatedButton(
-            onPressed: () {
-              _nextSection();
-            },
+            onPressed: _nextSection,
             child: Text('Next Section'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue,
