@@ -1,7 +1,6 @@
-import 'dart:convert';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:ielts_gym/services/firebase_service.dart';
 import 'package:ielts_gym/widgets/question_widget.dart';
 
 class ListeningScreen extends StatefulWidget {
@@ -10,8 +9,10 @@ class ListeningScreen extends StatefulWidget {
 }
 
 class _ListeningScreenState extends State<ListeningScreen> {
+  final FirebaseService _firebaseService = FirebaseService();
   late AudioPlayer _audioPlayer;
   String? _audioUrl;
+  String? _imageUrl;
   late Map<String, dynamic> _questionsData;
   bool _isLoading = true;
   bool _isAudioComplete = false;
@@ -30,20 +31,15 @@ class _ListeningScreenState extends State<ListeningScreen> {
     });
 
     try {
-      final response = await http.get(
-        Uri.parse('https://firebasestorage.googleapis.com/v0/b/ielts-gym-edbdf.appspot.com/o/listening_material%2Ftest_1%2Fsection$_currentSection%2Fdata.json?alt=media'),
-      );
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        setState(() {
-          _questionsData = data['questionData'];
-          _audioUrl = 'https://firebasestorage.googleapis.com/v0/b/ielts-gym-edbdf.appspot.com/o/listening_material%2Ftest_1%2Fsection$_currentSection%2Faudio.mp3?alt=media';
-          _isLoading = false;
-        });
-        _playAudio();
-      } else {
-        throw Exception('Failed to load data');
-      }
+      final sectionData = await _firebaseService.fetchSectionData('listening_material/test_1', 'section$_currentSection');
+
+      setState(() {
+        _questionsData = sectionData['questionData'];
+        _audioUrl = sectionData['audioUrl'];
+        _imageUrl = sectionData['imageUrl'];
+        _isLoading = false;
+      });
+      _playAudio();
     } catch (e) {
       print('Error: $e');
       setState(() {
@@ -86,6 +82,11 @@ class _ListeningScreenState extends State<ListeningScreen> {
           ? Center(child: CircularProgressIndicator())
           : Column(
         children: [
+          if (_imageUrl != null)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Image.network(_imageUrl!),
+            ),
           Expanded(
             child: ListView.builder(
               itemCount: _questionsData['questions'].length,

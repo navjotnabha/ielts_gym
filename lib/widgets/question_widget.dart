@@ -132,10 +132,35 @@ class _QuestionWidgetState extends State<QuestionWidget> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Image.network(imageUrl),
           ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: Text(widget.question['question']),
-        ),
+         Row(
+           children: [
+             Padding(
+               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+               child: Text(widget.question['question']),
+             ),
+             DropdownButton<String>(
+               value: selectedAnswer,
+               hint: const Text("Select an answer", style: TextStyle(color: Colors.red)),
+               onChanged: (String? newValue) {
+                 setState(() {
+                   selectedAnswer = newValue;
+                 });
+               },
+               items: widget.question['options']
+                   .map<DropdownMenuItem<String>>((dynamic option) {
+                 return DropdownMenuItem<String>(
+                   value: option,
+                   child: Text(option,style: TextStyle(color: Colors.green[800]),),
+                 );
+               }).toList(),
+             ),
+           ],
+         ),
+        //  Padding(
+        //   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        //   child: Text(widget.question['question']),
+        // ),
+
       ],
     );
   }
