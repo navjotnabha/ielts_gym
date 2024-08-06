@@ -76,7 +76,7 @@ class _ListeningScreenState extends State<ListeningScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Listening Test'),
+        title: Text('Listening Test'),
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
